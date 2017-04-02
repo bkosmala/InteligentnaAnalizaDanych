@@ -77,7 +77,15 @@ public class Layer {
     	// beta - wspó³czynnik, gdy d¹¿y do nieskonczonoœæi funkcja zmienia siê w funkcjê skokow¹.
     	// domyœlnie beta=1
     	
-    	return 1.0/(1.0 + Math.exp(-1*beta*x));
+    	return 1.0/(1.0 + Math.exp(-1*beta*x));	
+    }
+    
+    public static double sumSquaredError()
+    {
+    	// funkcja obliczania b³êdu œrediokwadratowego
     	
+    	//TODO
+    	
+    	return 0;
     }
 }

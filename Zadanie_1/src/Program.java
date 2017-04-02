@@ -23,7 +23,7 @@ public class Program {
 			network1.getAnswer(inputs[i]);
 		}
 	}
-	
+	//TODO - dodaæ bias
 	//TODO - wczytywanie danych z pliku (pliki txt podane w treœci zadania)
 
 }

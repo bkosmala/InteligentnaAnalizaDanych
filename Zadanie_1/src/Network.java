@@ -19,9 +19,11 @@ public class Network {
 		for(int i = 0; i<hiddenLayersCount;i++)
 		{
 			this.layers[i] = new Layer(neuronsPerLayer[i],inputsPerNeuron[i]);
-		}
-		
-		
+		}	
+	}
+	
+	public void learnNetwork(double[] inputs, double[] outputs)
+	{
 		
 	}
 	
