@@ -1,3 +1,4 @@
+import java.lang.*;
 
 public class Layer {
 	
@@ -30,18 +31,19 @@ public class Layer {
 			for(int k = 0; k<singleInputsCount;k++)
 			{
 				this.weightsMatrix[i][k] = randomNumber(0,1);
+				//System.out.println("\nNeuron: "+ i +" Waga " + k + " Wartoœæ: " + this.weightsMatrix[i][k]);
 			}
 		}
-		
+				
 	}
 	
 	public void Learn(double[] inputs)
 	{
-		
+		// TODO - algorytm nauki gradientowy, dodaæ
 		
 	}
 	
-    private double[] getOutput(double[] inputs)
+    public double[] getOutput(double[] inputs)
     {
     	// realizacja dzia³ania warstwy: mno¿enie macierzy zgodnie z równaniem Y = N * X
     	
@@ -51,10 +53,14 @@ public class Layer {
 		{
 			for(int k = 0; k<singleInputsCount;k++)
 			{
+				System.out.println("Wejœcie " + k + " wartoœæ " + inputs[k]);
 				result[i] += this.weightsMatrix[i][k] * inputs[k];
 			}
+			result[i] = sigmoidActivation(1,result[i]);
+			System.out.println("Neuron " + i + " odpowiedŸ " + result[i]);
 		}
-    	   	
+		
+
     	return result;
     	
     }
@@ -62,5 +68,16 @@ public class Layer {
     public static double randomNumber(double min, double max){
         double d = min+Math.random()*(max-min);
         return d;
+    }
+    
+    public static double sigmoidActivation(double beta, double x)
+    {
+    	// sigmoidalna funkcja aktywacji, postaci f(s)=1/(1+exp(bs))
+    	// x -argument
+    	// beta - wspó³czynnik, gdy d¹¿y do nieskonczonoœæi funkcja zmienia siê w funkcjê skokow¹.
+    	// domyœlnie beta=1
+    	
+    	return 1.0/(1.0 + Math.exp(-1*beta*x));
+    	
     }
 }

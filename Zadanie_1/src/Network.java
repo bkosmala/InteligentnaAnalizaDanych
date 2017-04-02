@@ -24,4 +24,23 @@ public class Network {
 		
 		
 	}
+	
+	public void getAnswer(double[] inputs)
+	{
+		//  inputs symuluje warstwê wejœciow¹, zak³adam ¿e sieæ po³¹czeñ jest gêsta i dane z wejœcia trafiaj¹ do wszystkich neuronów z warstwy 
+		//  iloœæ wejœæ w inputs = iloœæ wejœæ ka¿dego pojedynczego neuronu
+		
+		// TODO - poprawiæ - wersja tymczasowa, tylko dla jednego neuronu w jednej warstwie
+		
+		for(int i = 0; i<this.layers.length;i++)
+		{
+			double[] result = this.layers[i].getOutput(inputs);
+			for(int j = 0; j<result.length;j++)
+			{
+				System.out.println("Warstwa " + i + " neuron " + j + " rezultat " + result[j]);
+			}
+			
+		}
+		
+	}
 }
