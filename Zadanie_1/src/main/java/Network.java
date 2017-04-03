@@ -1,3 +1,4 @@
+package main.java;
 
 public class Network {
 //klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera warstwy)
