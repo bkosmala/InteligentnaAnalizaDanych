@@ -37,9 +37,25 @@ public class Layer {
 				
 	}
 	
-	public void Learn(double[] inputs)
+	public double[] Learn(double[] inputs)
 	{
 		// TODO - algorytm nauki gradientowy, dodaæ
+		
+    	// realizacja dzia³ania warstwy: mno¿enie macierzy zgodnie z równaniem Y = N * X
+    	
+    	double[] result = new double[this.neuronsCount];
+    	
+		for(int i = 0; i<neuronsCount;i++)
+		{
+			for(int k = 0; k<singleInputsCount;k++)
+			{
+				System.out.println("Wejœcie " + k + " wartoœæ " + inputs[k]);
+				result[i] += this.weightsMatrix[i][k] * inputs[k];
+			}
+			result[i] = sigmoidActivation(1,result[i]);
+			System.out.println("Neuron " + i + " odpowiedŸ " + result[i]);
+		}
+    	return result;
 		
 	}
 	
@@ -59,10 +75,7 @@ public class Layer {
 			result[i] = sigmoidActivation(1,result[i]);
 			System.out.println("Neuron " + i + " odpowiedŸ " + result[i]);
 		}
-		
-
     	return result;
-    	
     }
     
     public static double randomNumber(double min, double max){
@@ -78,14 +91,5 @@ public class Layer {
     	// domyœlnie beta=1
     	
     	return 1.0/(1.0 + Math.exp(-1*beta*x));	
-    }
-    
-    public static double sumSquaredError()
-    {
-    	// funkcja obliczania b³êdu œrediokwadratowego
-    	
-    	//TODO
-    	
-    	return 0;
     }
 }
