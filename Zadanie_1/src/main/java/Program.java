@@ -25,6 +25,7 @@ public class Program {
 		//network1.getAnswer(inputs);
 	}
 	//TODO - dodaæ bias
+	//TODO - zaimplementwaæ metodê uczenia: wstecznej propagacji b³êdu z gradientem
 	//TODO - wczytywanie danych z pliku (pliki txt podane w treœci zadania)
 
 }

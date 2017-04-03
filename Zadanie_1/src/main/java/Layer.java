@@ -24,25 +24,21 @@ public class Layer {
 		
 		this.singleInputsCount = singleInputsCount;
 		this.neuronsCount = neuronsCount;
-		
 		this.weightsMatrix = new double[neuronsCount][singleInputsCount];
-		//inicjalizacja wag liczbami losowymi
-		
-		for(int i = 0; i<neuronsCount;i++)
+
+		for(int i = 0; i<neuronsCount;i++) //inicjalizacja wag liczbami losowymi
 		{
 			for(int k = 0; k<singleInputsCount;k++)
 			{
 				this.weightsMatrix[i][k] = randomNumber(0,1);
 				//System.out.println("\nNeuron: "+ i +" Waga " + k + " Wartoœæ: " + this.weightsMatrix[i][k]);
 			}
-		}
-				
+		}			
 	}
 	
 	public double[] Learn(double[] inputs)
 	{
 		// TODO - algorytm nauki gradientowy, dodaæ
-		
     	// realizacja dzia³ania warstwy: mno¿enie macierzy zgodnie z równaniem Y = N * X
     	
     	double[] result = new double[this.neuronsCount];
@@ -57,14 +53,12 @@ public class Layer {
 			result[i] = sigmoidActivation(1,result[i]);
 			System.out.println("Neuron " + i + " odpowiedŸ " + result[i]);
 		}
-    	return result;
-		
+    	return result;	
 	}
 	
     public double[] getOutput(double[] inputs)
     {
     	// realizacja dzia³ania warstwy: mno¿enie macierzy zgodnie z równaniem Y = N * X
-    	
     	double[] result = new double[this.neuronsCount];
     	
 		for(int i = 0; i<neuronsCount;i++)
@@ -80,9 +74,16 @@ public class Layer {
     	return result;
     }
     
-    public static double randomNumber(double min, double max){
-        double d = min+Math.random()*(max-min);
-        return d;
+    public void modifyWeights()
+    {	// modyfikacja wag
+		for(int i = 0; i<neuronsCount;i++) //inicjalizacja wag liczbami losowymi
+		{
+			for(int k = 0; k<singleInputsCount;k++)
+			{
+				//this.weightsMatrix[i][k] = randomNumber(0,1);
+				//System.out.println("\nNeuron: "+ i +" Waga " + k + " Wartoœæ: " + this.weightsMatrix[i][k]);
+			}
+		}
     }
     
     public static double sigmoidActivation(double beta, double x)
@@ -91,7 +92,11 @@ public class Layer {
     	// x -argument
     	// beta - wspó³czynnik, gdy d¹¿y do nieskonczonoœæi funkcja zmienia siê w funkcjê skokow¹.
     	// domyœlnie beta=1
-    	
     	return 1.0/(1.0 + Math.exp(-1*beta*x));	
+    }
+    
+    public static double randomNumber(double min, double max){
+        double d = min+Math.random()*(max-min);
+        return d;
     }
 }

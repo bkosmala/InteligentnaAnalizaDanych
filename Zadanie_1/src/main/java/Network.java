@@ -6,6 +6,7 @@ public class Network {
 	Layer[] layers;
 	public Network(int hiddenLayersCount, int[] neuronsPerLayer, int[] inputsPerNeuron)
 	{
+		//konstruowanie sieci
 		//hiddenLayersCount - liczba warstw neuronów, u nas zwykle 1
 		
 		//sprawdzenie poprawnoœci danych
@@ -14,7 +15,6 @@ public class Network {
 			System.out.println("Network - b³êdne dane wejœciowe");
 			return;
 		}
-		
 		
 		this.layers = new Layer[hiddenLayersCount];
 		for(int i = 0; i<hiddenLayersCount;i++)
@@ -49,7 +49,7 @@ public class Network {
 				System.out.println("Warstwa " + i + " neuron " + j + " rezultat " + result[j]);
 			}		
 		}	
-		//tymczasowe, sprawadziæ dalej
+		//tymczasowe, sprawdziæ dalej
 		error += (result[0]-outputs[0])*(result[0]-outputs[0]);
 		
 		if((outputs[0]-result[0])<0.1)// testowo, dla okreœlenia poprawnoœci wyniku
