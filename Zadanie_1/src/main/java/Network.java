@@ -30,7 +30,7 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 		// warstwa wyjœciowa, iloœæ wejœæ jest równa iloœci wyjœæ poprzedniej warstwy ukrytej
 	}
 
-	public void learnNetwork(double[][] inputs, double[] outputs, int epochCount, double minError, double step, double moment)
+	public void learnNetwork(double[][] inputs, double[][] outputs, int epochCount, double minError, double step, double moment)
 	{
 		// inputs symuluje warstwê wejœciow¹, zak³adam ¿e sieæ po³¹czeñ jest
 		// gêsta i dane z wejœcia trafiaj¹ do wszystkich neuronów z warstwy
@@ -41,7 +41,9 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 		double error = 0;
 		double[] result = { 0 };
 		double[] inputsToLayer ={};
+		double[] outputsToLayer ={};
 		double[][] randomInputs={};
+		double[][] randomOutputs={};
 		double licznik;
 		int procent;
 		
@@ -50,10 +52,15 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 		{
 			System.out.println("\nEpoka: " + epoka + " - Pocz¹tek.\n");
 			licznik = 0;
-			randomInputs = getRandomInputs(inputs);
+			int [][] order = getRandomOrder(inputs);
+			randomInputs = getRandomData(inputs,order);
+			randomOutputs = getRandomData(outputs,order);
+			
 			for (int k = 0; k < randomInputs.length; k++) // kolejne dane treningowe
 			{			
 				inputsToLayer = randomInputs[k];
+				outputsToLayer = randomOutputs[k];
+				
 				
 				for(int in=0; in<inputsToLayer.length;in++){  System.out.println("Wejœcie " + in + " wartoœæ " + inputsToLayer[in]);}
 				
@@ -75,10 +82,10 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 				
 				for(int s=0; s<result.length;s++)
 				{//b³¹d œredniokwadratowy
-					error+=(result[s] - outputs[s]) * (result[s] - outputs[s]);
+					error+=(result[s] - outputsToLayer[s]) * (result[s] - outputsToLayer[s]);
 					
 					//obliczenie sygna³u zwrotnego dla wszystkich warstw - propagacja wsteczna b³êdu
-					this.outputLayer.calculateBackError(outputs);
+					this.outputLayer.calculateBackError(outputsToLayer);
 					
 					// tymczasowe - zmieniæ w przypadku, gdy sieæ bêdzie mia³a wiêcej warstw ukrytych
 					this.layers[0].calculateBackError(this.outputLayer);
@@ -87,19 +94,20 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 					this.layers[0].modifyWeights(step, moment, randomInputs[k]);
 					this.outputLayer.modifyWeights(step, moment, this.layers[0].savedNeuronsOutput);
 				
-					if (Math.abs((outputs[s] - result[s])) < 0.1)// testowo czy wynik jest poprawny
+					if (Math.abs((outputsToLayer[s] - result[s])) < 0.1)// testowo czy wynik jest poprawny
 					{
-						System.out.println("OdpowiedŸ poprawna.\n");
+						System.out.println("Wyjœcie "+s+" OdpowiedŸ poprawna. (Poprawnie: "+outputsToLayer[s]+")");
 						licznik = licznik + 1;
 					} else {
-						System.out.println("OdpowiedŸ b³êdna. (Poprawnie: "+outputs[s]+")\n");
+						System.out.println("Wyjœcie "+s+" OdpowiedŸ b³êdna. (Poprawnie: "+outputsToLayer[s]+")");
 					}
 				}
+				System.out.println("");
 			}
 			error = 0.5 * error;
 			System.out.println("Epoka: " + epoka + " Koniec Testu. B³¹d sredniokwadratowy: " + error);
 			
-			procent = (int)((licznik/outputs.length)*100);
+			procent = (int)((licznik/(outputs.length*outputLayer.getNeuronsCount()))*100);
 			System.out.println("\nKoniec epoki, procentowa poprawnoœæ dopasowania: " + procent + "%");
 			
 			if (error < minError) {
@@ -112,7 +120,7 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 	}
 
 	public void getAnswer(double[][] inputs, double[] outputs) {
-
+		//TODO - poprawiæ - output z wieloma neuronami
 		double[] result = { 0 };
 		double[] inputsToLayer ={};
 		double licznik;
@@ -147,10 +155,10 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 			System.out.println("\nKoniec epoki, procentowa poprawnoœæ dopasowania: " + procent + "%");
 	}
 	
-	public double[][] getRandomInputs(double[][] inputs) {
-		
+	public int[][] getRandomOrder(double[][] inputs) 
+	{
 		int[][] order = new int[inputs.length][2];
-		double[][] result = new double[inputs.length][inputs[0].length];
+		
 		// wylosowana kolejnoœæ + powi¹zane indeksy
 		
 		for(int k=0;k<inputs.length;k++)
@@ -175,18 +183,31 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 		    	order[j][1]=temp2;
 		    }
 		}
+		
 		/*
-		System.out.println("");
 		for(int k=0;k<inputs.length;k++)
 		{
 			System.out.println(order[k][0] + " indeks: " + order[k][1]);
 		}
 		
-		System.out.println("");
+		System.out.println("");*/
+		 
 		
+		return order;
+	}
+	
+	public double[][] getRandomData(double[][] inputs, int[][] order) 
+	{
+		double[][] result = new double[inputs.length][inputs[0].length];
+		
+		/*
 		for(int k=0;k<inputs.length;k++)
-		{
-			System.out.println(inputs[k][0] + " indeks: " + inputs[k][1]);
+		{	
+			System.out.println();
+			for(int s=0; s<inputs[0].length;s++)
+			{
+			System.out.print(inputs[k][s] + " ");
+			}
 		}*/
 		
 		for(int k=0;k<inputs.length;k++)
@@ -196,12 +217,16 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 			result[k][s]=inputs[order[k][1]][s];
 			}
 		}
-		
-		/*System.out.println("");
+		/*
+		System.out.println("");
 		
 		for(int k=0;k<inputs.length;k++)
-		{
-			System.out.println(result[k][0] + " indeks: " + result[k][1]);
+		{	
+			System.out.println();
+			for(int s=0; s<inputs[0].length;s++)
+			{
+			System.out.print(result[k][s] + " ");
+			}
 		}*/
 		
 		return result;
