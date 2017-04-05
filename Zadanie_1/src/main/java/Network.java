@@ -7,9 +7,10 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 	private Layer[] layers;
 	private Layer outputLayer;
 	private int hiddenLayersCount; // hiddenLayersCount - liczba warstw neuronów, u nas zwykle 1
+
 	
 
-	public Network(int hiddenLayersCount, int[] neuronsPerLayer, int[] inputsPerNeuron, int outputsCount) {
+	public Network(int hiddenLayersCount, int[] neuronsPerLayer, int[] inputsPerNeuron, int outputsCount, boolean isBias) {
 		// konstruowanie sieci
 		this.hiddenLayersCount = hiddenLayersCount;
 
@@ -22,14 +23,15 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 		//System.out.println("Warstwy ukryte - tworzenie.");
 		this.layers = new Layer[hiddenLayersCount];
 		for (int i = 0; i < hiddenLayersCount; i++) {
-			this.layers[i] = new Layer(neuronsPerLayer[i], inputsPerNeuron[i]);
+			this.layers[i] = new Layer(neuronsPerLayer[i], inputsPerNeuron[i],isBias);
 		}
 		//System.out.println("Warstwa wyjœciowa - tworzenie.");
-		this.outputLayer = new Layer(outputsCount, neuronsPerLayer[neuronsPerLayer.length - 1]);
+		this.outputLayer = new Layer(outputsCount, neuronsPerLayer[neuronsPerLayer.length - 1],isBias);
 		// warstwa wyjœciowa, iloœæ wejœæ jest równa iloœci wyjœæ poprzedniej warstwy ukrytej
 	}
 
-	public void learnNetwork(double[][] inputs, double[] outputs, int epochCount, double minError, double step) {
+	public void learnNetwork(double[][] inputs, double[] outputs, int epochCount, double minError, double step, double moment)
+	{
 		// inputs symuluje warstwê wejœciow¹, zak³adam ¿e sieæ po³¹czeñ jest
 		// gêsta i dane z wejœcia trafiaj¹ do wszystkich neuronów z warstwy
 		// iloœæ wejœæ w inputs = iloœæ wejœæ ka¿dego pojedynczego neuronu
@@ -73,7 +75,6 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 					System.out.println("Warstwa wyjœciowa, neuron " + j + " rezultat " + result[j]);
 				}
 				
-				double[] backError = new double[result.length];
 				for(int s=0; s<result.length;s++)
 				{//b³¹d œredniokwadratowy
 					singleCaseError+=(result[s] - outputs[s]) * (result[s] - outputs[s]);
@@ -86,8 +87,8 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 					this.layers[0].calculateBackError(this.outputLayer);
 					
 					//modyfikacja wag
-					this.layers[0].modifyWeights(step, randomInputs[k]);
-					this.outputLayer.modifyWeights(step, this.layers[0].savedNeuronsOutput);
+					this.layers[0].modifyWeights(step, moment, randomInputs[k]);
+					this.outputLayer.modifyWeights(step, moment, this.layers[0].savedNeuronsOutput);
 				
 					if (Math.abs((outputs[s] - result[s])) < 0.1)// testowo czy wynik jest poprawny
 					{
