@@ -7,6 +7,11 @@ public class Layer {
 	private int singleInputsCount;
 	private int neuronsCount;
 	private double[][] weightsMatrix;
+	
+	//To Learn Mode
+	public double[] savedNeuronsOutput;
+	public double[] savedNeuronsInSum;
+	public double[] backError;
 
 	// klasa symuluj¹ca ca³¹ werstwê neuronów
 	public Layer(int neuronsCount, int singleInputsCount) {
@@ -14,8 +19,7 @@ public class Layer {
 		// + oprócz tego dochodzi ewentualnie bias
 		// neuronsCount - iloœæ neuronów w warstwie
 
-		// w klasie tej operujemy na wektorach i macierzach
-		// Jeœli potraktujemy wejœcie X oraz wyjœcie Y jako wektory liczb rzeczywistych,
+		// w klasie tej operujemy na wektorach i macierzach. Jeœli potraktujemy wejœcie X oraz wyjœcie Y jako wektory liczb rzeczywistych,
 		// to warstwa neuronów zachowuje siê jako macierz N i mamy równanie Y = N * X
 		// mno¿enie macie¿y wymaga zgodnoœci wymiarów tzn macie¿ o wymiarach [n,m] * [m,p] => [n,p]
 		// u nas n - to iloœæ neuronów w warstwie, m - iloœæ wag, a p jest zawsze równe 1 (na wyjœciu otrzymujemy wektor o wymiarach [n,1] )
@@ -27,26 +31,30 @@ public class Layer {
 		for (int i = 0; i < neuronsCount; i++) // inicjalizacja wag liczbami losowymi
 		{
 			for (int k = 0; k < singleInputsCount; k++) {
-				this.weightsMatrix[i][k] = randomNumber(0, 1);
-				 System.out.println("\nNeuron: "+ i +" Waga " + k + " Wartoœæ: " + this.weightsMatrix[i][k]);
+				this.weightsMatrix[i][k] = randomNumber(-1, 1);
+				 //System.out.println("\nNeuron: "+ i +" Waga " + k + " Wartoœæ: " + this.weightsMatrix[i][k]);
 			}
 		}
+		
+		this.savedNeuronsOutput = new double[this.neuronsCount];
+		this.savedNeuronsInSum = new double[this.neuronsCount];
+		this.backError = new double[neuronsCount];
 	}
 
 	public double[] Learn(double[] inputs) {
-		// TODO - algorytm nauki gradientowy, dodaæ
-		// realizacja dzia³ania warstwy: mno¿enie macierzy zgodnie z równaniem Y = N * X
-
+		
 		double[] result = new double[this.neuronsCount];
 
 		for (int i = 0; i < neuronsCount; i++) {
 			for (int k = 0; k < singleInputsCount; k++) {
-				System.out.println("Wejœcie " + k + " wartoœæ " + inputs[k]);
+				//System.out.println("Wejœcie " + k + " wartoœæ " + inputs[k]);
 				result[i] += this.weightsMatrix[i][k] * inputs[k];
 			}
+			this.savedNeuronsInSum[i]=result[i];
 			result[i] = sigmoidActivation(1, result[i]);
-			System.out.println("Neuron " + i + " odpowiedŸ " + result[i]);
+			//System.out.println("Neuron " + i + " odpowiedŸ " + result[i]);
 		}
+		this.savedNeuronsOutput=result;
 		return result;
 	}
 
@@ -56,21 +64,45 @@ public class Layer {
 
 		for (int i = 0; i < neuronsCount; i++) {
 			for (int k = 0; k < singleInputsCount; k++) {
-				System.out.println("Wejœcie " + k + " wartoœæ " + inputs[k]);
+				//System.out.println("Wejœcie " + k + " wartoœæ " + inputs[k]);
 				result[i] += this.weightsMatrix[i][k] * inputs[k];
 			}
 			result[i] = sigmoidActivation(1, result[i]);
-			System.out.println("Neuron " + i + " odpowiedŸ " + result[i]);
+			//System.out.println("Neuron " + i + " odpowiedŸ " + result[i]);
 		}
 		return result;
 	}
-
-	public void modifyWeights() { 				// modyfikacja wag
-		for (int i = 0; i < neuronsCount; i++)  // inicjalizacja wag liczbami losowymi
+	
+	public void calculateBackError(double[] outputs)
+	{
+		for(int s=0; s<neuronsCount;s++)
 		{
-			for (int k = 0; k < singleInputsCount; k++) {
-				// this.weightsMatrix[i][k] = randomNumber(0,1);
-				// System.out.println("\nNeuron: "+ i +" Waga " + k + " Wartoœæ: " + this.weightsMatrix[i][k]);
+		this.backError[s]= (
+				sigmoidActivation(1, savedNeuronsInSum[s]) * (1 - sigmoidActivation(1, savedNeuronsInSum[s]))
+			  ) * (outputs[s] - savedNeuronsOutput[s]);
+		}	
+	}
+	
+	public void calculateBackError(Layer nextLayer)
+	{
+		for(int i=0; i<neuronsCount;i++)
+		{
+			backError[i]=0;
+			for(int k=0;k<nextLayer.getNeuronsCount();k++)
+			{
+				backError[i] += (nextLayer.getWeightsMatrix())[k][i] * nextLayer.backError[k];
+			}
+			backError[i] = backError[i] * (
+				sigmoidActivation(1, savedNeuronsInSum[i]) * (1 - sigmoidActivation(1, savedNeuronsInSum[i])));
+		}	
+	}
+	
+	
+	public void modifyWeights(double step, double[] inputs) { 			
+		for (int i = 0; i < this.neuronsCount; i++)
+		{
+			for (int k = 0; k < this.singleInputsCount; k++) {	
+				this.weightsMatrix[i][k] = this.weightsMatrix[i][k] + step * this.backError[i] * inputs[k];
 			}
 		}
 	}
@@ -86,4 +118,13 @@ public class Layer {
 		double d = min + Math.random() * (max - min);
 		return d;
 	}
-}
+	public int getNeuronsCount()
+	{
+		return this.neuronsCount;
+	}
+	public double[][] getWeightsMatrix()
+	{
+		return this.weightsMatrix;
+	}
+	
+}	
