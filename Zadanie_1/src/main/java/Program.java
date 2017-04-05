@@ -51,9 +51,9 @@ public class Program {
 		
 		// warunki stopu algorytmu uczenia: liczba epok lub dok³adnoœæ wyniku (b³¹d œredniokwadratowy poni¿ej jaiejœ wartoœci)
 		int epochCount = 1000;
-		double step = 0.3;   //wspó³czynnik nauki
+		double step = 0.7;   //wspó³czynnik nauki
 		double moment = 0.1; //wspó³czynnik momentu
-		double minError = 0.1;
+		double minError = 0.05;
 		// tryb nauki
 		network3.learnNetwork(inputs, outputs, epochCount, minError,step,moment);
 
