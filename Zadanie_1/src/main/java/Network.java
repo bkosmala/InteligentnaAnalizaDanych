@@ -39,7 +39,6 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 		// funkcja dla etapu uczenia sieci
 
 		double error = 0;
-		double singleCaseError = 0;
 		double[] result = { 0 };
 		double[] inputsToLayer ={};
 		double[][] randomInputs={};
@@ -53,8 +52,7 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 			licznik = 0;
 			randomInputs = getRandomInputs(inputs);
 			for (int k = 0; k < randomInputs.length; k++) // kolejne dane treningowe
-			{
-				singleCaseError=0;				
+			{			
 				inputsToLayer = randomInputs[k];
 				
 				for(int in=0; in<inputsToLayer.length;in++){  System.out.println("Wejœcie " + in + " wartoœæ " + inputsToLayer[in]);}
@@ -77,8 +75,7 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 				
 				for(int s=0; s<result.length;s++)
 				{//b³¹d œredniokwadratowy
-					singleCaseError+=(result[s] - outputs[s]) * (result[s] - outputs[s]);
-					error += singleCaseError;
+					error+=(result[s] - outputs[s]) * (result[s] - outputs[s]);
 					
 					//obliczenie sygna³u zwrotnego dla wszystkich warstw - propagacja wsteczna b³êdu
 					this.outputLayer.calculateBackError(outputs);
@@ -98,7 +95,6 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 						System.out.println("OdpowiedŸ b³êdna. (Poprawnie: "+outputs[s]+")\n");
 					}
 				}
-				singleCaseError=0.5*singleCaseError;
 			}
 			error = 0.5 * error;
 			System.out.println("Epoka: " + epoka + " Koniec Testu. B³¹d sredniokwadratowy: " + error);
@@ -115,24 +111,40 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 
 	}
 
-	public void getAnswer(double[][] inputs) {
-		// inputs symuluje warstwê wejœciow¹, zak³adam ¿e sieæ po³¹czeñ jest
-		// gêsta i dane z wejœcia trafiaj¹ do wszystkich neuronów z warstwy
-		// iloœæ wejœæ w inputs = iloœæ wejœæ ka¿dego pojedynczego neuronu
-		// funkcja dla sieci ju¿ nauczonej
-
-		// TODO - poprawiæ - wersja tymczasowa, tylko dla jednego neuronu w jednej warstwie
+	public void getAnswer(double[][] inputs, double[] outputs) {
 
 		double[] result = { 0 };
-
-		for (int k = 0; k < inputs.length; k++) {
-			for (int i = 0; i < this.layers.length; i++) {
-				result = this.layers[i].getOutput(inputs[k]);
-				for (int j = 0; j < result.length; j++) {
-					System.out.println("Warstwa " + i + " neuron " + j + " rezultat " + result[j]);
+		double[] inputsToLayer ={};
+		double licznik;
+		int procent;
+		
+			licznik = 0;
+			for (int k = 0; k < inputs.length; k++) // kolejne dane treningowe
+			{			
+				inputsToLayer = inputs[k];
+				for(int in=0; in<inputsToLayer.length;in++){  System.out.println("Wejœcie " + in + " wartoœæ " + inputsToLayer[in]);}
+				
+				for (int i = 0; i < this.layers.length; i++) // wynik dla warstwy
+				{
+					result = this.layers[i].Learn(inputsToLayer);
+					inputsToLayer = result; // wynik warstwy poprzedniej to wejœcie dla warstwy kolejnej, w tym wypadku wyjœciowej
+				}
+				result = this.outputLayer.getOutput(inputsToLayer);
+				
+				for(int s=0; s<result.length;s++)
+				{				
+					if (Math.abs((outputs[s] - result[s])) < 0.1)// testowo czy wynik jest poprawny
+					{
+						System.out.println("OdpowiedŸ poprawna.\n");
+						licznik = licznik + 1;
+					} else {
+						System.out.println("OdpowiedŸ b³êdna. (Poprawnie: "+outputs[s]+")\n");
+					}
 				}
 			}
-		}
+			
+			procent = (int)((licznik/outputs.length)*100);
+			System.out.println("\nKoniec epoki, procentowa poprawnoœæ dopasowania: " + procent + "%");
 	}
 	
 	public double[][] getRandomInputs(double[][] inputs) {
