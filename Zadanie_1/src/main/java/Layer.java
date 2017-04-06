@@ -9,6 +9,7 @@ public class Layer {
 	private double[][] weightsMatrix;
 	private double[][] deltaWeights;
 	private boolean isBias;
+	private double beta;
 	
 	//To Learn Mode
 	public double[] savedNeuronsOutput;
@@ -16,7 +17,7 @@ public class Layer {
 	public double[] backError;
 
 	// klasa symuluj¹ca ca³¹ werstwê neuronów
-	public Layer(int neuronsCount, int singleInputsCount, boolean isBias) {
+	public Layer(int neuronsCount, int singleInputsCount, boolean isBias, double beta) {
 		// singleInputsCount - iloœæ wejœæ dla pojedynczego neuronu, czyli równie¿ iloœæ wag
 		// + oprócz tego dochodzi ewentualnie bias
 		// neuronsCount - iloœæ neuronów w warstwie
@@ -25,7 +26,7 @@ public class Layer {
 		// to warstwa neuronów zachowuje siê jako macierz N i mamy równanie Y = N * X
 		// mno¿enie macie¿y wymaga zgodnoœci wymiarów tzn macie¿ o wymiarach [n,m] * [m,p] => [n,p]
 		// u nas n - to iloœæ neuronów w warstwie, m - iloœæ wag, a p jest zawsze równe 1 (na wyjœciu otrzymujemy wektor o wymiarach [n,1] )
-		
+		this.beta = beta;
 		this.singleInputsCount = singleInputsCount;
 		this.neuronsCount = neuronsCount;
 		this.isBias = isBias;
@@ -60,7 +61,7 @@ public class Layer {
 				result[i] += this.weightsMatrix[i][k] * inputs[k];
 			}
 			this.savedNeuronsInSum[i]=result[i];
-			result[i] = sigmoidActivation(1, result[i]);
+			result[i] = sigmoidActivation(this.beta, result[i]);
 			//System.out.println("Neuron " + i + " odpowiedŸ " + result[i]);
 		}
 		this.savedNeuronsOutput=result;
@@ -78,7 +79,7 @@ public class Layer {
 				//System.out.println("Wejœcie " + k + " wartoœæ " + inputs[k]);
 				result[i] += this.weightsMatrix[i][k] * inputs[k];
 			}
-			result[i] = sigmoidActivation(1, result[i]);
+			result[i] = sigmoidActivation(this.beta, result[i]);
 			//System.out.println("Neuron " + i + " odpowiedŸ " + result[i]);
 		}
 		return result;
@@ -89,7 +90,7 @@ public class Layer {
 		for(int s=0; s<neuronsCount;s++)
 		{
 		this.backError[s]= (
-				sigmoidActivation(1, savedNeuronsInSum[s]) * (1 - sigmoidActivation(1, savedNeuronsInSum[s]))
+				sigmoidActivation(this.beta, savedNeuronsInSum[s]) * (1 - sigmoidActivation(this.beta, savedNeuronsInSum[s]))
 			  ) * (outputs[s] - savedNeuronsOutput[s]);
 		}	
 	}
@@ -104,7 +105,7 @@ public class Layer {
 				backError[i] += (nextLayer.getWeightsMatrix())[k][i] * nextLayer.backError[k];
 			}
 			backError[i] = backError[i] * (
-				sigmoidActivation(1, savedNeuronsInSum[i]) * (1 - sigmoidActivation(1, savedNeuronsInSum[i])));
+				sigmoidActivation(this.beta, savedNeuronsInSum[i]) * (1 - sigmoidActivation(this.beta, savedNeuronsInSum[i])));
 		}	
 	}
 	
@@ -117,7 +118,7 @@ public class Layer {
 		{
 			for (int k = 0; k < this.singleInputsCount; k++) {	
 				prevWeight = this.weightsMatrix[i][k];
-				this.weightsMatrix[i][k] = this.weightsMatrix[i][k] + step * this.backError[i] * inputs[k] + moment * this.deltaWeights[i][k];
+				this.weightsMatrix[i][k] +=  step * this.backError[i] * inputs[k] + moment * this.deltaWeights[i][k];
 				this.deltaWeights[i][k] = this.weightsMatrix[i][k] - prevWeight;	 
 			}
 		}

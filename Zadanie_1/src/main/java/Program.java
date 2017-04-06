@@ -21,7 +21,8 @@ public class Program {
 		int[] inputsCount = {2};
 		int outputCount = 1;
 		boolean isBias = true;
-		Network network1 = new Network(1 ,neuronsCount,inputsCount,outputCount,isBias);
+		double beta = 1.0; 	 // beta (f. aktywacji)- Mo¿e przyjmowaæ wartoœci w przedziale 0.01 - 5.0; typowo 0.8 - 2.0
+		Network network1 = new Network(1 ,neuronsCount,inputsCount,outputCount,isBias,beta);
 		
 		double[][] inputs = {{3,4},{1,4},{2,4},{1,5},{2,5},{2,3},
 				 {4,-1},{5,-1},{4,-2},{5,-2},{6,-2},{5,-3},{6,-3}};
@@ -29,7 +30,7 @@ public class Program {
 		
 		// warunki stopu algorytmu uczenia: liczba epok lub dok³adnoœæ wyniku (b³¹d œredniokwadratowy poni¿ej jaiejœ wartoœci)
 		int epochCount = 100;
-		double step = 0.7;   //wspó³czynnik nauki
+		double step = 0.5;   //wspó³czynnik nauki
 		double moment = 0.1; //wspó³czynnik momentu
 		double minError = 0.09;
 		// tryb nauki
@@ -40,39 +41,42 @@ public class Program {
 		
 		
 		//***************** 3 - Transformacja ***********
-		
+		/*
 		System.out.println("3 - Transformacja.");
 		
 		// Parametry sieci
-		int[] neuronsCount = {1}; // iloœæ neuronów w warstwie ukrytej
+		int[] neuronsCount = {3}; // iloœæ neuronów w warstwie ukrytej
 		int[] inputsCount = {4};  // iloœæ wejœæ
 		int outputCount = 4;	  // iloœæ wyjœæ
-		boolean isBias = false;	  // bies
-		Network network3 = new Network(1 ,neuronsCount,inputsCount,outputCount,isBias);
+		boolean isBias = true;	  // bias
+		double beta = 1.0; 	 // beta (f. aktywacji)- Mo¿e przyjmowaæ wartoœci w przedziale 0.01 - 5.0; typowo 0.8 - 2.0
+		Network network3 = new Network(1 ,neuronsCount,inputsCount,outputCount,isBias,beta);
 		
 		double[][] inputs = wczytajZPliku("./src/main/resources/transformation.txt");
 		double outputs[][] = inputs;
 		
 		// Parametry nauki
 		int epochCount = 1000;	  //maksymalna liczba epok
-		double step = 0.7;        //wspó³czynnik nauki
-		double moment = 0.1;      //wspó³czynnik momentu
+		double step = 0.5;        //wspó³czynnik nauki, pomiêdzy 0.01 a 0.6
+		double moment = 0.6;      //wspó³czynnik momentu, Przyjmuje wartoœci z przedzia³u 0 - 1, najczêœciej stosowane to 0.5 - 1
 		double minError = 0.05;   //wartoœæ b³êdu œredniokwdratowego, dla której nastêpuje koniec obliczeñ
 		// tryb nauki
 		network3.learnNetwork(inputs, outputs, epochCount, minError,step,moment);
 		
-		//network3.getErrorHistory();
+		network3.getErrorHistory();*/
 		
 		//***************** 4 - Aproksymacja ***********
-		/*
+		
 		System.out.println("4 - Aproksymacja");
 		
 		int[] neuronsCount = {10};
 		int[] inputsCount = {1};
 		int outputCount = 1;
 		boolean isBias = true;
-		Network network4 = new Network(1 ,neuronsCount,inputsCount,outputCount,isBias);
+		double beta = 1.0; 	 // beta (f. aktywacji)- Mo¿e przyjmowaæ wartoœci w przedziale 0.01 - 5.0; typowo 0.8 - 2.0
+		Network network4 = new Network(1 ,neuronsCount,inputsCount,outputCount,isBias,beta);
 		
+		// pierwszy zbiór ucz¹cy
 		double[][] temp = wczytajZPliku("./src/main/resources/approximation_train_1.txt");
 		
 		double[][] inputs = new double[temp.length][1];
@@ -88,13 +92,14 @@ public class Program {
 		}
 		
 		// warunki stopu algorytmu uczenia: liczba epok lub dok³adnoœæ wyniku (b³¹d œredniokwadratowy poni¿ej jaiejœ wartoœci)
-		int epochCount = 500;
-		double step = 0.3;   //wspó³czynnik nauki
-		double moment = 0.2; //wspó³czynnik momentu
+		int epochCount = 1000;
+		double step = 0.4;   //wspó³czynnik nauki
+		double moment = 0.6; //wspó³czynnik momentu
 		double minError = 0.1;
 		// tryb nauki
 		network4.learnNetwork(inputs, outputs, epochCount, minError,step,moment);
 		
+		// drugi zbiór ucz¹cy
 		double[][] temp2 = wczytajZPliku("./src/main/resources/approximation_train_2.txt");
 		
 		double[][] inputs2 = new double[temp2.length][1];
@@ -109,7 +114,7 @@ public class Program {
 			
 		}
 		
-		network4.learnNetwork(inputs2, outputs2, epochCount, minError,step,moment);*/
+		network4.learnNetwork(inputs2, outputs2, epochCount, minError,step,moment);
 		/*
 		double[][] temp3 = wczytajZPliku("./src/main/resources/approximation_test.txt");
 		

@@ -11,10 +11,11 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 	
 	//Statistics
 	public double[] errorHistory;
+	private int lastEpoch;
 
 	
 
-	public Network(int hiddenLayersCount, int[] neuronsPerLayer, int[] inputsPerNeuron, int outputsCount, boolean isBias) {
+	public Network(int hiddenLayersCount, int[] neuronsPerLayer, int[] inputsPerNeuron, int outputsCount, boolean isBias, double beta) {
 		// konstruowanie sieci
 		this.hiddenLayersCount = hiddenLayersCount;
 
@@ -27,10 +28,10 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 		//System.out.println("Warstwy ukryte - tworzenie.");
 		this.layers = new Layer[hiddenLayersCount];
 		for (int i = 0; i < hiddenLayersCount; i++) {
-			this.layers[i] = new Layer(neuronsPerLayer[i], inputsPerNeuron[i],isBias);
+			this.layers[i] = new Layer(neuronsPerLayer[i], inputsPerNeuron[i],isBias,beta);
 		}
 		//System.out.println("Warstwa wyjœciowa - tworzenie.");
-		this.outputLayer = new Layer(outputsCount, neuronsPerLayer[neuronsPerLayer.length - 1],isBias);
+		this.outputLayer = new Layer(outputsCount, neuronsPerLayer[neuronsPerLayer.length - 1],isBias, beta);
 		// warstwa wyjœciowa, iloœæ wejœæ jest równa iloœci wyjœæ poprzedniej warstwy ukrytej
 	}
 
@@ -114,6 +115,7 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 			error = 0.5 * error;
 			System.out.println("Epoka: " + epoka + " Koniec Testu. B³¹d sredniokwadratowy: " + error);
 			this.errorHistory[epoka-1] = error;
+			lastEpoch=epoka;
 			
 			procent = (int)((licznik/(outputs.length*outputLayer.getNeuronsCount()))*100);
 			System.out.println("\nKoniec epoki, procentowa poprawnoœæ dopasowania: " + procent + "%");
@@ -265,6 +267,7 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 		for(int k=0;k<this.errorHistory.length;k++)
 		{	
 			System.out.println(this.errorHistory[k]);
+			if(k==(this.lastEpoch-1)){break;}
 		}
 		return this.errorHistory;
 	}
