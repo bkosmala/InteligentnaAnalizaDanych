@@ -7,6 +7,10 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 	private Layer[] layers;
 	private Layer outputLayer;
 	private int hiddenLayersCount; // hiddenLayersCount - liczba warstw neuronów, u nas zwykle 1
+	
+	
+	//Statistics
+	public double[] errorHistory;
 
 	
 
@@ -37,7 +41,10 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 		// iloœæ wejœæ w inputs = iloœæ wejœæ ka¿dego pojedynczego neuronu
 		// uwzglêdnia obliczanie b³êdu œrednokwadratowego
 		// funkcja dla etapu uczenia sieci
-
+		
+		//Statistics
+		this.errorHistory = new double[epochCount];
+		
 		double error = 0;
 		double[] result = { 0 };
 		double[] inputsToLayer ={};
@@ -87,7 +94,7 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 					//obliczenie sygna³u zwrotnego dla wszystkich warstw - propagacja wsteczna b³êdu
 					this.outputLayer.calculateBackError(outputsToLayer);
 					
-					// tymczasowe - zmieniæ w przypadku, gdy sieæ bêdzie mia³a wiêcej warstw ukrytych
+					// zmieniæ w przypadku, gdy sieæ bêdzie mia³a wiêcej warstw ukrytych
 					this.layers[0].calculateBackError(this.outputLayer);
 					
 					//modyfikacja wag
@@ -106,6 +113,7 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 			}
 			error = 0.5 * error;
 			System.out.println("Epoka: " + epoka + " Koniec Testu. B³¹d sredniokwadratowy: " + error);
+			this.errorHistory[epoka-1] = error;
 			
 			procent = (int)((licznik/(outputs.length*outputLayer.getNeuronsCount()))*100);
 			System.out.println("\nKoniec epoki, procentowa poprawnoœæ dopasowania: " + procent + "%");
@@ -119,40 +127,54 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 
 	}
 
-	public void getAnswer(double[][] inputs, double[] outputs) {
-		//TODO - poprawiæ - output z wieloma neuronami
+	public void getAnswer(double[][] inputs, double[][] outputs) {
+
+		double error = 0;
 		double[] result = { 0 };
 		double[] inputsToLayer ={};
+		double[] outputsToLayer ={};
 		double licznik;
 		int procent;
 		
+		
+			System.out.println("START\n");
 			licznik = 0;
+			
 			for (int k = 0; k < inputs.length; k++) // kolejne dane treningowe
 			{			
 				inputsToLayer = inputs[k];
+				outputsToLayer = outputs[k];
+				
+				
 				for(int in=0; in<inputsToLayer.length;in++){  System.out.println("Wejœcie " + in + " wartoœæ " + inputsToLayer[in]);}
 				
 				for (int i = 0; i < this.layers.length; i++) // wynik dla warstwy
 				{
-					result = this.layers[i].Learn(inputsToLayer);
+					result = this.layers[i].getOutput(inputsToLayer);
 					inputsToLayer = result; // wynik warstwy poprzedniej to wejœcie dla warstwy kolejnej, w tym wypadku wyjœciowej
 				}
 				result = this.outputLayer.getOutput(inputsToLayer);
 				
 				for(int s=0; s<result.length;s++)
-				{				
-					if (Math.abs((outputs[s] - result[s])) < 0.1)// testowo czy wynik jest poprawny
+				{//b³¹d œredniokwadratowy
+					error+=(result[s] - outputsToLayer[s]) * (result[s] - outputsToLayer[s]);
+									
+					if (Math.abs((outputsToLayer[s] - result[s])) < 0.1)// testowo czy wynik jest poprawny
 					{
-						System.out.println("OdpowiedŸ poprawna.\n");
+						System.out.println("Wyjœcie "+s+" OdpowiedŸ poprawna. (Poprawnie: "+outputsToLayer[s]+")");
 						licznik = licznik + 1;
 					} else {
-						System.out.println("OdpowiedŸ b³êdna. (Poprawnie: "+outputs[s]+")\n");
+						System.out.println("Wyjœcie "+s+" OdpowiedŸ b³êdna. (Poprawnie: "+outputsToLayer[s]+")");
 					}
 				}
+				System.out.println("");
 			}
+			error = 0.5 * error;
+			System.out.println("Koniec. B³¹d sredniokwadratowy: " + error);
 			
-			procent = (int)((licznik/outputs.length)*100);
-			System.out.println("\nKoniec epoki, procentowa poprawnoœæ dopasowania: " + procent + "%");
+			procent = (int)((licznik/(outputs.length*outputLayer.getNeuronsCount()))*100);
+			System.out.println("\nKoniec epoki, procentowa poprawnoœæ dopasowania: " + procent + "%");		
+		
 	}
 	
 	public int[][] getRandomOrder(double[][] inputs) 
@@ -235,6 +257,16 @@ public class Network {// klasa bêd¹ca modelem ca³ej sieci neuronów (zawiera wars
 	public static int randomInt(int min, int max) {
 		int d = min + (int)(Math.random() * (max - min));
 		return d;
+	}
+	
+	public double[] getErrorHistory()
+	{
+		System.out.println("");
+		for(int k=0;k<this.errorHistory.length;k++)
+		{	
+			System.out.println(this.errorHistory[k]);
+		}
+		return this.errorHistory;
 	}
 	
 }

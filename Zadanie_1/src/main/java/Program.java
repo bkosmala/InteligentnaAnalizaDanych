@@ -11,6 +11,9 @@ public class Program {
 
 	public static void main(String[] args) {
 		
+		//Ró¿ne przypadki - zakomentowane linie równie¿ s¹ poprawne
+		//by sprawdziæ dzia³anie odkomentowaæ wybrany fragment
+		
 		//***************** PRZYPADEK TESTOWY ***********
 		/*
 		System.out.println("Test dla pojedynczego neuronu.");
@@ -40,23 +43,88 @@ public class Program {
 		
 		System.out.println("3 - Transformacja.");
 		
-		int[] neuronsCount = {1};
-		int[] inputsCount = {4};
-		int outputCount = 4;
-		boolean isBias = true;
+		// Parametry sieci
+		int[] neuronsCount = {1}; // iloœæ neuronów w warstwie ukrytej
+		int[] inputsCount = {4};  // iloœæ wejœæ
+		int outputCount = 4;	  // iloœæ wyjœæ
+		boolean isBias = false;	  // bies
 		Network network3 = new Network(1 ,neuronsCount,inputsCount,outputCount,isBias);
 		
 		double[][] inputs = wczytajZPliku("./src/main/resources/transformation.txt");
 		double outputs[][] = inputs;
 		
-		// warunki stopu algorytmu uczenia: liczba epok lub dok³adnoœæ wyniku (b³¹d œredniokwadratowy poni¿ej jaiejœ wartoœci)
-		int epochCount = 1000;
-		double step = 0.7;   //wspó³czynnik nauki
-		double moment = 0.1; //wspó³czynnik momentu
-		double minError = 0.05;
+		// Parametry nauki
+		int epochCount = 1000;	  //maksymalna liczba epok
+		double step = 0.7;        //wspó³czynnik nauki
+		double moment = 0.1;      //wspó³czynnik momentu
+		double minError = 0.05;   //wartoœæ b³êdu œredniokwdratowego, dla której nastêpuje koniec obliczeñ
 		// tryb nauki
 		network3.learnNetwork(inputs, outputs, epochCount, minError,step,moment);
-
+		
+		//network3.getErrorHistory();
+		
+		//***************** 4 - Aproksymacja ***********
+		/*
+		System.out.println("4 - Aproksymacja");
+		
+		int[] neuronsCount = {10};
+		int[] inputsCount = {1};
+		int outputCount = 1;
+		boolean isBias = true;
+		Network network4 = new Network(1 ,neuronsCount,inputsCount,outputCount,isBias);
+		
+		double[][] temp = wczytajZPliku("./src/main/resources/approximation_train_1.txt");
+		
+		double[][] inputs = new double[temp.length][1];
+		double[][] outputs = new double[temp.length][1];
+		
+		for(int k=0;k<temp.length;k++)
+		{	
+			System.out.println();
+				inputs[k][0]=temp[k][0];
+				outputs[k][0]=temp[k][1];
+			System.out.print(inputs[k][0] + " " + outputs[k][0]);
+			
+		}
+		
+		// warunki stopu algorytmu uczenia: liczba epok lub dok³adnoœæ wyniku (b³¹d œredniokwadratowy poni¿ej jaiejœ wartoœci)
+		int epochCount = 500;
+		double step = 0.3;   //wspó³czynnik nauki
+		double moment = 0.2; //wspó³czynnik momentu
+		double minError = 0.1;
+		// tryb nauki
+		network4.learnNetwork(inputs, outputs, epochCount, minError,step,moment);
+		
+		double[][] temp2 = wczytajZPliku("./src/main/resources/approximation_train_2.txt");
+		
+		double[][] inputs2 = new double[temp2.length][1];
+		double[][] outputs2 = new double[temp2.length][1];
+		
+		for(int k=0;k<temp2.length;k++)
+		{	
+			System.out.println();
+				inputs2[k][0]=temp2[k][0];
+				outputs2[k][0]=temp2[k][1];
+			System.out.print(inputs2[k][0] + " " + outputs2[k][0]);
+			
+		}
+		
+		network4.learnNetwork(inputs2, outputs2, epochCount, minError,step,moment);*/
+		/*
+		double[][] temp3 = wczytajZPliku("./src/main/resources/approximation_test.txt");
+		
+		double[][] inputs3 = new double[temp3.length][1];
+		double[][] outputs3 = new double[temp3.length][1];
+		
+		for(int k=0;k<temp3.length;k++)
+		{	
+			System.out.println("");
+				inputs3[k][0]=temp3[k][0];
+				outputs3[k][0]=temp3[k][1];
+			System.out.print(inputs3[k][0] + " " + outputs3[k][0]);
+		}
+		System.out.println("bbbbbbb");
+		network4.getAnswer(inputs3, outputs3);*/
 		
 	}
 	
@@ -99,7 +167,7 @@ public class Program {
 			for(int k=0;k<tab.length;k++)
 			{
 				result[counter][k] = Double.parseDouble(tab[k]);
-				//System.out.print(result[counter][k] + "\n");
+				System.out.print(result[counter][k] + "\n");
 			}
 			counter++;
 			//System.out.println("");	
