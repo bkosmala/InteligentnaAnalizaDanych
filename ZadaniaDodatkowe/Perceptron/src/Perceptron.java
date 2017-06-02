@@ -1,4 +1,3 @@
-
 public class Perceptron {
 	private int inputsCount;
 	private double[] weights;
@@ -52,4 +51,5 @@ public class Perceptron {
         double d = min+Math.random()*(max-min);
         return d;
     }
+    
 }
